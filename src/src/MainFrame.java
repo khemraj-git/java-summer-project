@@ -14,7 +14,8 @@ class MainFrame extends JFrame {
     private DefaultListModel<Contact> contactListModel;
     private JList<Contact> contactList;
     private ArrayList<Contact> fullList = new ArrayList<>();
-    private JButton deleteButton, searchButton;
+    private JButton addButton, deleteButton, searchButton, viewButton;
+    private JScrollPane contactScrollPane;
     private static final String FILE_NAME = "contacts.csv";
 
     public MainFrame() {
@@ -24,7 +25,10 @@ class MainFrame extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new BorderLayout());
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+
 
         nameField = new JTextField();
         phoneField = new JTextField();
@@ -35,36 +39,47 @@ class MainFrame extends JFrame {
 
 
 
-        inputPanel.add(new JLabel("Name:"));
-        inputPanel.add(nameField);
-        inputPanel.add(new JLabel("Phone:"));
-        inputPanel.add(phoneField);
-        inputPanel.add(new JLabel("Email:"));
-        inputPanel.add(emailField);
-        inputPanel.add(new JLabel("Search:"));
-        inputPanel.add(searchField);
-        inputPanel.add(new JLabel("Address:"));
-        inputPanel.add(addressField);
-        inputPanel.add(new JLabel("Date-of-Birth:"));
-        inputPanel.add(dobField);
+        inputPanel.add(labeledField("Name:", nameField));
+        inputPanel.add(labeledField("Phone:", phoneField));
+        inputPanel.add(labeledField("Email:", emailField));
+        inputPanel.add(labeledField("Address:", addressField));
+        inputPanel.add(labeledField("Date-of-Birth:", dobField));
+        inputPanel.add(labeledField("Search:", searchField));
 
-        JButton addButton = new JButton("Add Contact");
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        addButton = new JButton("Add Contact");
         deleteButton = new JButton("Delete Selected");
         searchButton = new JButton("Search");
-        inputPanel.add(addButton);
-        inputPanel.add(deleteButton);
+        viewButton = new JButton("View Contacts");
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(searchButton);
+        buttonPanel.add(viewButton);
+
+        panel.add(buttonPanel, BorderLayout.SOUTH); // ✅ Add to UI
+
 
         contactListModel = new DefaultListModel<>();
         contactList = new JList<>(contactListModel);
 
         panel.add(inputPanel, BorderLayout.NORTH);
-        panel.add(new JScrollPane(contactList), BorderLayout.CENTER);
-        panel.add(searchButton, BorderLayout.SOUTH);
+        contactScrollPane = new JScrollPane(contactList);
+        contactScrollPane.setVisible(false); // hide list initially
+        panel.add(contactScrollPane, BorderLayout.CENTER);
+
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
 
 
         addButton.addActionListener(e -> addContact());
         deleteButton.addActionListener(e -> deleteSelectedContact());
         searchButton.addActionListener(e -> searchContact());
+        viewButton.addActionListener(e -> toggleView());
+
 
 
         add(panel);
@@ -151,6 +166,21 @@ class MainFrame extends JFrame {
             }
         }
     }
+    private void toggleView() {
+        contactScrollPane.setVisible(!contactScrollPane.isVisible());
+        revalidate();
+        repaint();
+    }
+
+    private JPanel labeledField(String labelText, JTextField textField) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        panel.add(new JLabel(labelText), BorderLayout.NORTH);
+        panel.add(textField, BorderLayout.CENTER);
+        return panel;
+    }
+
+
 
 
 
